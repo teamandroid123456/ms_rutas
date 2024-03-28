@@ -5,10 +5,12 @@ import { CreateRutaDto } from './dto/create-ruta.dto';
 @Controller('rutas')
 export class RutasController {
   constructor(private readonly rutasService: RutasService) {}
+
   @Get()
   async getRutas() {
     return this.rutasService.getRutas();
   }
+
   @Post('comprar-asientos')
   async comprarAsientos(@Body() comprarAsientosDto: CreateRutaDto): Promise<string> {
     const { origen, destino, fechaViaje, asientosComprar } = comprarAsientosDto;
@@ -22,18 +24,15 @@ export class RutasController {
       throw new BadRequestException('No hay suficientes asientos disponibles para la cantidad solicitada.');
     }
 
-    await this.rutasService.updateAsientosDisponibles(ruta.id, ruta.asientos_disponibles - asientosComprar);
+    await this.rutasService.updateAsientosDisponibles(ruta.origen,ruta.destino,ruta.fechaViaje, ruta.asientos_disponibles - asientosComprar);
     const monto = ruta.precio * asientosComprar;
 
-   
-  const resultadoPago = await this.rutasService.realizarPago(comprarAsientosDto.numeroCuenta, monto);
-
-  if (resultadoPago.error) {
-    await this.rutasService.rollbackUpdateAsientos(origen, destino, fechaViaje, asientosComprar);
-    throw new HttpException(resultadoPago.error, HttpStatus.INTERNAL_SERVER_ERROR);
+    const resultadoPago = await this.rutasService.realizarPago(comprarAsientosDto.numeroCuenta, monto);
+    if (resultadoPago.error) {
+      console.log("hola")
+      await this.rutasService.rollbackUpdateAsientos(origen, destino, fechaViaje, asientosComprar);
+      throw new HttpException(resultadoPago.error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return `Asientos comprados exitosamente para la ruta ${ruta.origen} - ${ruta.destino} el ${ruta.fechaViaje}.`;
   }
-  return `Asientos comprados exitosamente para la ruta ${ruta.origen} - ${ruta.destino} el ${ruta.fechaViaje}.`;
-
-}
-
 }

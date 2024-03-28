@@ -1,20 +1,14 @@
+
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Rutas } from './rutas/entities/ruta.entity';
+import { MongooseModule } from '@nestjs/mongoose';
 import { RutasModule } from './rutas/rutas.module';
+import { Ruta,RutaSchema } from './rutas/entities/ruta.entity';
 
 @Module({
-  imports: [RutasModule,
-    TypeOrmModule.forRoot({
-      type: 'mysql', 
-      host: 'localhost', 
-      port: 3306, 
-      username: 'root',
-      password: '12345678', 
-      database: 'bd_atotal',
-      entities: [Rutas],
-      synchronize: true, 
-    }),
+  imports: [
+    RutasModule,
+    MongooseModule.forRoot('mongodb+srv://jojhan24:21DEjunio@cluster0.a4ikckw.mongodb.net/bd_atotal'),
+    MongooseModule.forFeature([{ name: Ruta.name, schema: RutaSchema }]),
   ],
 })
 export class AppModule {}

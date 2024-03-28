@@ -1,26 +1,29 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity()
-export class Rutas {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ length: 100 })
+@Schema()
+export class Ruta {
+  @Prop({ required: true })
+  _id: string;
+  @Prop({ required: true })
   origen: string;
 
-  @Column({ length: 100 })
+  @Prop({ required: true })
   destino: string;
 
-  @Column({ length: 100 })
+  @Prop({ required: true })
   fechaViaje: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Prop({ type: Number })
   precio: number;
 
-  @Column({ default: 0 })
+  @Prop({ default: 0 })
   asientos_totales: number;
-  
-  @Column({ default: 0 })
+
+  @Prop({ default: 0 })
   asientos_disponibles: number;
-  
 }
+
+export type RutaDocument = Ruta & Document;
+
+export const RutaSchema = SchemaFactory.createForClass(Ruta);
